@@ -1,0 +1,22 @@
+using System.Reflection;
+
+namespace CliTool.YamlHandling;
+
+public static class Reflection
+{
+    public static TConfig DictionaryToConfig<TConfig>(Dictionary<object, object> dict) where TConfig : new()
+    {
+        var config = new TConfig();
+        var props = typeof(TConfig).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+        foreach (var prop in props)
+        {
+            if (dict.TryGetValue(prop.Name, out var value))
+            {
+                prop.SetValue(config, Convert.ChangeType(value, prop.PropertyType));
+            }
+        }
+
+        return config;
+    }
+}
