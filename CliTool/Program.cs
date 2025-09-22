@@ -17,22 +17,24 @@ Actions:
 
 var deserializer = new DeserializerBuilder()  
     .WithNamingConvention(NullNamingConvention.Instance)  
-    .Build();  
-var actions = (IEnumerable)deserializer.Deserialize(yaml)!;  
+    .Build();
 
-foreach (var action in actions)  
+var deserializerYaml = (IEnumerable)deserializer.Deserialize(yaml)!;
+
+foreach (var actionsList in deserializerYaml)  
 {  
-    var actions2 = ((KeyValuePair<object, object>)action).Value;  
-    foreach (var item in (IEnumerable)actions2)  
+    var actions = ((KeyValuePair<object, object>)actionsList).Value;
+    foreach (var action in (IEnumerable)actions)  
     {        
-        var itemDict = (Dictionary<object, object>)item;
+        var actionDict = (Dictionary<object, object>)action;
+        var logAction = new LogAction
+        {
+            Name = actionDict["Name"].ToString(),
+            Type = actionDict["Type"].ToString(),
+            Configuration = new LogActionConfig()
+        };
 
-        var logAction = new LogAction();
-        logAction.Name = itemDict["Name"].ToString();
-        logAction.Type = itemDict["Type"].ToString();
-        logAction.Configuration = new LogActionConfig();
-        
-        foreach (var item3 in (Dictionary<object, object>)itemDict["Configuration"])
+        foreach (var item3 in (Dictionary<object, object>)actionDict["Configuration"])
         {
             logAction.Configuration.Message =  item3.Value.ToString();
         }
