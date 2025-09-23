@@ -12,6 +12,9 @@ public static class ActionFactory
                 { Name = name, Type = type, Configuration = Reflection.DictionaryToConfig<LogActionConfig>(config) },
             "Parallel" => new ParallelAction
                 { Name = name, Type = type, Configuration = new ParallelActionConfig { Actions = Extractor.ExtractActions(config) } },
+            "Import" => new ImportAction
+                { Name = name, Type = type, Configuration = Reflection.DictionaryToConfig<ImportActionConfig>(config)
+            },
             _ => throw new Exception($"Unknown action type: {type}")
         };
     }

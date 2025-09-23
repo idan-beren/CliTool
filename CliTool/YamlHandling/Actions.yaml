@@ -1,0 +1,24 @@
+Actions:
+  
+  - Name: PrintHelloWorld
+    Type: Log
+    Configuration:
+      Message: Hello-world!
+
+  - Name: ParallelHelloWorld
+    Type: Parallel
+    Configuration:
+      Actions:
+        - Name: PrintHelloWorld
+          Type: Log
+          Configuration:
+            Message: Hello-world1!
+        - Name: PrintHelloWorld
+          Type: Log
+          Configuration:
+            Message: Hello-world2!
+            
+  - Name: Imported
+    Type: Import
+    Configuration:
+      Path: /Users/idan.beren/Desktop/SteamProject/CliTool/CliTool/YamlHandling/ImportedActions.yaml

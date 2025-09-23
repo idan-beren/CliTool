@@ -5,15 +5,14 @@ using YamlDotNet.Serialization.NamingConventions;
 
 namespace CliTool.YamlHandling;
 
-public static class YamlHandler
+public static class YamlDeserializer
 {
     private static readonly IDeserializer Deserializer = new DeserializerBuilder()
         .WithNamingConvention(NullNamingConvention.Instance)
         .Build();
 
-    public static List<IAction> Deserialize(string yaml)
+    public static dynamic Deserialize(string yaml)
     {
-        var root = Deserializer.Deserialize<dynamic>(yaml)!;
-        return Extractor.ExtractActions(root);
+        return Deserializer.Deserialize<dynamic>(yaml);
     }
 }

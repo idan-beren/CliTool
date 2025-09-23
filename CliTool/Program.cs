@@ -1,26 +1,12 @@
-﻿using CliTool.YamlHandling;
+﻿using CliTool.Actions;
+using CliTool.Utils;
+using CliTool.YamlHandling;
 
-var yaml = @"  
-Actions:  
-  - Name: PrintHelloWorld 
-    Type: Log    
-    Configuration:      
-        Message: ""Hello-world!""  
-  - Name: Parallel
-    Type: Parallel
-    Configuration:
-        Actions:
-            - Name: PrintHelloWorld 
-              Type: Log    
-              Configuration:      
-                  Message: ""Hello-world1!""  
-            - Name: PrintHelloWorld 
-              Type: Log    
-              Configuration:      
-                  Message: ""Hello-world2!""  
-";  
+var yaml = File.ReadAllText("/Users/idan.beren/Desktop/SteamProject/CliTool/CliTool/YamlHandling/Actions.yaml");
+var deserializedYaml = YamlDeserializer.Deserialize(yaml);
 
-var actions = YamlHandler.Deserialize(yaml);
+List<IAction> actions = Extractor.ExtractActions(deserializedYaml);
+
 foreach (var action in actions)
 {
     action.Act();
