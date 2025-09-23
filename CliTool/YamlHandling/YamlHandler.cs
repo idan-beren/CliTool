@@ -1,4 +1,5 @@
 using CliTool.Actions;
+using CliTool.Utils;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -12,14 +13,7 @@ public static class YamlHandler
 
     public static List<IAction> Deserialize(string yaml)
     {
-        var actions = new List<IAction>();
-        var root = Deserializer.Deserialize<Dictionary<string, List<Dictionary<string, object>>>>(yaml)!;
-
-        foreach (var actionInfo in root["Actions"])
-        {
-            var action = ActionFactory.Create(actionInfo["Name"].ToString()!, actionInfo["Type"].ToString()!, (Dictionary<object, object>)actionInfo["Configuration"]);
-            actions.Add(action);
-        }
-        return actions;
+        var root = Deserializer.Deserialize<dynamic>(yaml)!;
+        return Extractor.ExtractActions(root);
     }
 }

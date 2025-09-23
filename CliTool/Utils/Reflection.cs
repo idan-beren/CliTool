@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace CliTool.YamlHandling;
+namespace CliTool.Utils;
 
 public static class Reflection
 {

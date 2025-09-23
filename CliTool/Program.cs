@@ -2,14 +2,22 @@
 
 var yaml = @"  
 Actions:  
-  - Name: PrintHelloWorld1    
+  - Name: PrintHelloWorld 
     Type: Log    
     Configuration:      
-        Message: ""Hello-world1!""  
-  - Name: PrintHelloWorld2 
-    Type: Log   
-    Configuration:      
-        Message: ""Hello-world2!""  
+        Message: ""Hello-world!""  
+  - Name: Parallel
+    Type: Parallel
+    Configuration:
+        Actions:
+            - Name: PrintHelloWorld 
+              Type: Log    
+              Configuration:      
+                  Message: ""Hello-world1!""  
+            - Name: PrintHelloWorld 
+              Type: Log    
+              Configuration:      
+                  Message: ""Hello-world2!""  
 ";  
 
 var actions = YamlHandler.Deserialize(yaml);
