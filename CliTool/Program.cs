@@ -1,11 +1,7 @@
-﻿using CliTool.Actions;
-using CliTool.Utils;
-using CliTool.YamlHandling;
+﻿using CliTool.Utils;
 
-var yaml = File.ReadAllText("/Users/idan.beren/Desktop/SteamProject/CliTool/CliTool/YamlHandling/Actions.yaml");
-var deserializedYaml = YamlDeserializer.Deserialize(yaml);
-
-List<IAction> actions = Extractor.ExtractActions(deserializedYaml);
+var actions =
+    Extractor.ExtractActions("/Users/idan.beren/Desktop/SteamProject/CliTool/CliTool/YamlHandling/Actions.yaml");
 
 foreach (var action in actions)
 {
