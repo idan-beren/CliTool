@@ -1,0 +1,63 @@
+Actions:
+
+  - Type: Log
+    Message: "Hello-World!"
+    
+  - Type: Delay
+    Duration: 1000
+
+  - Type: Parallel
+    Actions:
+      - Type: Log
+        Message: "Hello1"
+      - Type: Log
+        Message: "Hello2"
+      - Type: Log
+        Message: "Hello3"
+
+  - Type: Import
+    Path: /Users/idan.beren/Desktop/SteamProject/CliTool/CliTool/Yaml/ImportedActions.yaml
+
+  - Type: Retry
+    Times: 3
+    Action:
+      Type: Log
+      Message: "Hello"
+
+  - Type: SetVariable
+    Name: Price
+    Value: 100
+
+  - Type: PrintVariable
+    Name: Price
+
+  - Type: Assert
+    Condition: "{{Price}} == 100"
+    
+  - Type: Parallel
+    Actions:
+       - Type: Http
+         Method: POST
+         Url: "https://jsonplaceholder.typicode.com/posts"
+         Body: |
+           {
+             "title": "Hello",
+             "body": "This is a test",
+             "userId": 1
+           }
+       - Type: Http
+         Method: GET
+         Url: "https://jsonplaceholder.typicode.com/posts/1"
+
+  - Type: Shell
+    Command: echo hello!
+    
+  - Type: Condition
+    Condition: "{{Price}} == 100"
+    Then:
+      - Type: Log
+        Message: "True"
+    Else:
+      - Type: Log
+        Message: "False"
+        

@@ -2,8 +2,9 @@ namespace CliTool.Actions;
 
 public interface IAction
 {
-    public string Name  { get; set; }
-    public string Type   { get; set; }
-
-    public void Act();
+    public string? Type   { get; set; }
+    
+    public Task<bool> Act();
+    
+    public string ToString();
 }

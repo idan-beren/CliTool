@@ -1,23 +1,28 @@
-using CliTool.Utils;
+using CliTool.Actions.CustomActions;
 
 namespace CliTool.Actions;
 
 public static class ActionFactory
 {
-    public static IAction Create(string name, string type, Dictionary<object, object> config)
+    private static readonly Dictionary<string, Type> ActionTypes = new(StringComparer.OrdinalIgnoreCase)
     {
-        return type switch
-        {
-            "Log" => new LogAction
-                { Name = name, Type = type, Configuration = Reflection.DictionaryToConfig<LogActionConfig>(config) },
-            "Parallel" => new ParallelAction
-                { Name = name, Type = type, Configuration = new ParallelActionConfig { Actions = Extractor.GetActions(config) } },
-            "Import" => new ImportAction
-                { Name = name, Type = type, Configuration = Reflection.DictionaryToConfig<ImportActionConfig>(config) },
-            "Retry" => new RetryAction
-                { Name = name, Type = type, Configuration = Reflection.DictionaryToConfig<RetryActionConfig>(config)
-                    with { Actions = Extractor.GetActions(config) } },
-            _ => throw new Exception($"Unknown action type: {type}")
-        };
+        { "Log", typeof(LogAction) },
+        { "Parallel", typeof(ParallelAction) },
+        { "Import", typeof(ImportAction) },
+        { "Retry", typeof(RetryAction) },
+        { "SetVariable", typeof(SetVariableAction) },
+        { "PrintVariable", typeof(PrintVariableAction) },
+        { "Assert", typeof(AssertAction) },
+        { "Http", typeof(HttpAction) },
+        { "Shell", typeof(ShellAction) },
+        { "Condition", typeof(ConditionAction) },
+        { "Delay", typeof(DelayAction) }
+    };
+
+    public static Type Resolve(string actionType)
+    {
+        if (ActionTypes.TryGetValue(actionType, out var type))
+            return type;
+        throw new Exception($"Unknown action type: {actionType}");
     }
 }

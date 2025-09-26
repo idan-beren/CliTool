@@ -1,6 +1,0 @@
-Actions:
-
-  - Name: PrintHelloWorld3
-    Type: Log
-    Configuration:
-      Message: Hello-world3!
