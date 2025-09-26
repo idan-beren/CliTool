@@ -1,0 +1,46 @@
+Actions:
+  
+  - Type: Log
+    Message: "Hello-World!"
+    
+  - Type: Delay
+    Duration: 100
+    
+  - Type: Assert
+    Condition: "1 + 2 == 3"
+  
+  - Type: Http
+    Method: GET
+    Url: "https://www.google.com"
+      
+  - Type: SetVariable
+    Name: Price
+    Value: 100
+    
+  - Type: PrintVariable
+    Name: Price
+  
+  - Type: Parallel
+    Actions:
+      - Type: Log
+        Message: "Hello-World!"
+        
+  - Type: Retry
+    Action:
+      Type: Log
+      Message: "Hello-World!"
+  
+  - Type: Shell
+    Command: 
+      
+  - Type: Condition
+    Condition: "{{Price}} == 100"
+    Then:
+      - Type: Log
+        Message: "True"
+    Else:
+      - Type: Log
+        Message: "False"
+        
+  - Type: Import
+    Path: /Users/idan.beren/Desktop/SteamProject/CliTool/CliTool/Yaml/ImportedActions.yaml
