@@ -1,8 +1,10 @@
+using System.Collections.Concurrent;
+
 namespace CliTool.Utils;
 
 public static class GlobalVariables
 {
-    private static readonly Dictionary<string, object?> Variables =  new();
+    private static readonly ConcurrentDictionary<string, object?> Variables =  new();
 
     public static bool SetVariable(string key, object value)
     {
@@ -14,7 +16,7 @@ public static class GlobalVariables
         return Variables.GetValueOrDefault(varName);
     }
     
-    public static Dictionary<string, object?> GetAllVariables()
+    public static IReadOnlyDictionary<string, object?> GetAllVariables()
     {
         return Variables;
     }

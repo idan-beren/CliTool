@@ -15,20 +15,14 @@ public class ActionTypeResolver(INodeDeserializer inner) : INodeDeserializer
         ObjectDeserializer rootDeserializer)
     {
         value = null;
-
         if (expectedType != typeof(BaseAction))
-        {
             return inner.Deserialize(reader, expectedType, nestedObjectDeserializer, out value, rootDeserializer);
-        }
 
         if (!reader.Accept<MappingStart>(out _))
             throw new YamlException("Expected a mapping for an Action");
 
-        // Buffer all events of this mapping
-        var buffer = new List<ParsingEvent>();
+        var buffer = new List<ParsingEvent> { reader.Consume<MappingStart>() };
         string? actionType = null;
-
-        buffer.Add(reader.Consume<MappingStart>());
 
         while (!reader.Accept<MappingEnd>(out _))
         {
@@ -43,7 +37,7 @@ public class ActionTypeResolver(INodeDeserializer inner) : INodeDeserializer
             }
             else
             {
-                CopyNode(reader, buffer);
+                BufferNode(reader, buffer);
             }
         }
 
@@ -52,16 +46,11 @@ public class ActionTypeResolver(INodeDeserializer inner) : INodeDeserializer
         if (actionType == null)
             throw new YamlException("Action does not define a 'Type' field");
 
-        var targetType = ActionFactory.Resolve(actionType);
-
-        // Reparse the buffered events into the correct type
-        var replayParser = new ReplayParser(buffer);
-        value = nestedObjectDeserializer(replayParser, targetType);
-
+        value = nestedObjectDeserializer(new ReplayParser(buffer), ActionFactory.Resolve(actionType));
         return true;
     }
 
-    private static void CopyNode(IParser reader, List<ParsingEvent> buffer)
+    private static void BufferNode(IParser reader, List<ParsingEvent> buffer)
     {
         if (reader.Accept<Scalar>(out _))
         {
@@ -73,17 +62,14 @@ public class ActionTypeResolver(INodeDeserializer inner) : INodeDeserializer
             while (!reader.Accept<MappingEnd>(out _))
             {
                 buffer.Add(reader.Consume<Scalar>());
-                CopyNode(reader, buffer);
+                BufferNode(reader, buffer);
             }
             buffer.Add(reader.Consume<MappingEnd>());
         }
         else if (reader.Accept<SequenceStart>(out _))
         {
             buffer.Add(reader.Consume<SequenceStart>());
-            while (!reader.Accept<SequenceEnd>(out _))
-            {
-                CopyNode(reader, buffer);
-            }
+            while (!reader.Accept<SequenceEnd>(out _)) BufferNode(reader, buffer);
             buffer.Add(reader.Consume<SequenceEnd>());
         }
         else
@@ -96,16 +82,6 @@ public class ActionTypeResolver(INodeDeserializer inner) : INodeDeserializer
 public class ReplayParser(IEnumerable<ParsingEvent> events) : IParser
 {
     private readonly IEnumerator<ParsingEvent> _events = events.GetEnumerator();
-
     public ParsingEvent Current { get; private set; } = null!;
-
-    public bool MoveNext()
-    {
-        if (_events.MoveNext())
-        {
-            Current = _events.Current;
-            return true;
-        }
-        return false;
-    }
+    public bool MoveNext() => _events.MoveNext() && (Current = _events.Current) != null;
 }
