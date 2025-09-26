@@ -24,52 +24,88 @@ public class ActionTypeResolver(INodeDeserializer inner) : INodeDeserializer
         if (!reader.Accept<MappingStart>(out _))
             throw new YamlException("Expected a mapping for an Action");
 
-        var temp = new Dictionary<string, object?>();
-        reader.Consume<MappingStart>();
-
+        // Buffer all events of this mapping
+        var buffer = new List<ParsingEvent>();
         string? actionType = null;
+
+        buffer.Add(reader.Consume<MappingStart>());
 
         while (!reader.Accept<MappingEnd>(out _))
         {
-            var key = reader.Consume<Scalar>().Value;
+            var key = reader.Consume<Scalar>();
+            buffer.Add(key);
 
-            object? val;
-            if (reader.Accept<Scalar>(out _))
+            if (key.Value == "Type")
             {
-                val = reader.Consume<Scalar>().Value;
-            }
-            else if (reader.Accept<MappingStart>(out _))
-            {
-                val = nestedObjectDeserializer(reader, typeof(Dictionary<string, object>));
-            }
-            else if (reader.Accept<SequenceStart>(out _))
-            {
-                val = nestedObjectDeserializer(reader, typeof(List<object>));
+                var typeVal = reader.Consume<Scalar>();
+                buffer.Add(typeVal);
+                actionType = typeVal.Value;
             }
             else
             {
-                throw new YamlException($"Unexpected YAML node for key {key}");
+                CopyNode(reader, buffer);
             }
-
-            temp[key] = val;
-
-            if (key == "Type" && val is string s)
-                actionType = s;
         }
 
-        reader.Consume<MappingEnd>();
+        buffer.Add(reader.Consume<MappingEnd>());
 
         if (actionType == null)
             throw new YamlException("Action does not define a 'Type' field");
 
         var targetType = ActionFactory.Resolve(actionType);
 
-        var yaml = new SerializerBuilder().Build().Serialize(temp);
-        value = new DeserializerBuilder()
-            .WithNodeDeserializer(this) 
-            .Build()
-            .Deserialize(yaml, targetType);
+        // Reparse the buffered events into the correct type
+        var replayParser = new ReplayParser(buffer);
+        value = nestedObjectDeserializer(replayParser, targetType);
 
         return true;
+    }
+
+    private static void CopyNode(IParser reader, List<ParsingEvent> buffer)
+    {
+        if (reader.Accept<Scalar>(out _))
+        {
+            buffer.Add(reader.Consume<Scalar>());
+        }
+        else if (reader.Accept<MappingStart>(out _))
+        {
+            buffer.Add(reader.Consume<MappingStart>());
+            while (!reader.Accept<MappingEnd>(out _))
+            {
+                buffer.Add(reader.Consume<Scalar>());
+                CopyNode(reader, buffer);
+            }
+            buffer.Add(reader.Consume<MappingEnd>());
+        }
+        else if (reader.Accept<SequenceStart>(out _))
+        {
+            buffer.Add(reader.Consume<SequenceStart>());
+            while (!reader.Accept<SequenceEnd>(out _))
+            {
+                CopyNode(reader, buffer);
+            }
+            buffer.Add(reader.Consume<SequenceEnd>());
+        }
+        else
+        {
+            throw new YamlException("Unexpected node while copying");
+        }
+    }
+}
+
+public class ReplayParser(IEnumerable<ParsingEvent> events) : IParser
+{
+    private readonly IEnumerator<ParsingEvent> _events = events.GetEnumerator();
+
+    public ParsingEvent Current { get; private set; } = null!;
+
+    public bool MoveNext()
+    {
+        if (_events.MoveNext())
+        {
+            Current = _events.Current;
+            return true;
+        }
+        return false;
     }
 }

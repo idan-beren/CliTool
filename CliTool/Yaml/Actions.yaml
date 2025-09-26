@@ -21,8 +21,20 @@ Actions:
   - Type: Retry
     Times: 3
     Action:
-      Type: Log
-      Message: "Hello"
+      Type: Parallel
+      Actions:
+        - Type: Http
+          Method: POST
+          Url: "https://jsonplaceholder.typicode.com/posts"
+          Body: |
+            {
+              "title": "Hello",
+              "body": "This is a test",
+              "userId": 1
+            }
+        - Type: Http
+          Method: GET
+          Url: "https://jsonplaceholder.typicode.com/posts/1"
 
   - Type: SetVariable
     Name: Price
@@ -60,4 +72,27 @@ Actions:
     Else:
       - Type: Log
         Message: "False"
-        
+
+  - Type: Parallel
+    Actions:
+      - Type: Http
+        Method: GET
+        Url: "https://jsonplaceholder.typicode.com/posts/1"
+      - Type: Parallel
+        Actions:
+          - Type: Http
+            Method: GET
+            Url: "https://jsonplaceholder.typicode.com/posts/1"
+          - Type: Parallel
+            Actions:
+              - Type: Http
+                Method: GET
+                Url: "https://jsonplaceholder.typicode.com/posts/1"
+              - Type: Retry
+                Times: 3
+                Action:
+                  Type: Parallel
+                  Actions:
+                    - Type: Http
+                      Method: GET
+                      Url: "https://jsonplaceholder.typicode.com/posts/1"

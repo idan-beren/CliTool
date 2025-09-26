@@ -11,14 +11,13 @@ Actions:
   
   - Type: Http
     Method: GET
-    Url: "htt://google.com"
-    Body:
+    Url: "https://www.google.com"
       
-  - Type: SetVar
+  - Type: SetVariable
     Name: Price
     Value: 100
     
-  - Type: PrintVar
+  - Type: PrintVariable
     Name: Price
   
   - Type: Parallel
@@ -35,7 +34,7 @@ Actions:
     Command: 
       
   - Type: Condition
-    If: "#{Price} == 100"
+    Condition: "{{Price}} == 100"
     Then:
       - Type: Log
         Message: "True"
@@ -44,4 +43,4 @@ Actions:
         Message: "False"
         
   - Type: Import
-    Path: YamlFile/ImportedActions.yaml
+    Path: /Users/idan.beren/Desktop/SteamProject/CliTool/CliTool/Yaml/ImportedActions.yaml
