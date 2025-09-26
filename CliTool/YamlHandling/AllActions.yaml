@@ -1,0 +1,47 @@
+Actions:
+  
+  - Type: Log
+    Message: "Hello-World!"
+    
+  - Type: Delay
+    Duration: 100
+    
+  - Type: Assert
+    Condition: "1 + 2 == 3"
+  
+  - Type: Http
+    Method: GET
+    Url: "htt://google.com"
+    Body:
+      
+  - Type: SetVar
+    Name: Price
+    Value: 100
+    
+  - Type: PrintVar
+    Name: Price
+  
+  - Type: Parallel
+    Actions:
+      - Type: Log
+        Message: "Hello-World!"
+        
+  - Type: Retry
+    Action:
+      Type: Log
+      Message: "Hello-World!"
+  
+  - Type: Shell
+    Command: 
+      
+  - Type: Condition
+    If: "#{Price} == 100"
+    Then:
+      - Type: Log
+        Message: "True"
+    Else:
+      - Type: Log
+        Message: "False"
+        
+  - Type: Import
+    Path: YamlFile/ImportedActions.yaml

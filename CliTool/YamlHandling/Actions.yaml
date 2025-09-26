@@ -22,3 +22,13 @@ Actions:
     Type: Import
     Configuration:
       Path: /Users/idan.beren/Desktop/SteamProject/CliTool/CliTool/YamlHandling/ImportedActions.yaml
+  
+  - Name: Retry
+    Type: Retry
+    Configuration:
+      Times: 3
+      Actions:
+        - Name: PrintHelloWorld
+          Type: Log
+          Configuration:
+            Message: Hello-world!
