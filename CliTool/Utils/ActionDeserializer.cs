@@ -1,3 +1,4 @@
+using CliTool.Actions;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using YamlDotNet.Serialization.NodeDeserializers;
@@ -11,8 +12,8 @@ public static class ActionDeserializer
         .WithNodeDeserializer<ActionTypeResolver>(inner => new ActionTypeResolver(inner),
             s => s.InsteadOf<ObjectNodeDeserializer>()).Build();
 
-    public static T Deserialize<T>(string yaml)
+    public static List<BaseAction> Deserialize(string yaml)
     {
-        return Deserializer.Deserialize<T>(yaml);
+        return Deserializer.Deserialize<Dictionary<string, List<BaseAction>>>(yaml)["Actions"];
     }
 }

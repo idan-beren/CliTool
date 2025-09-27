@@ -1,5 +1,3 @@
-using System.Reflection;
-
 namespace CliTool.Actions;
 
 public abstract class BaseAction : IAction

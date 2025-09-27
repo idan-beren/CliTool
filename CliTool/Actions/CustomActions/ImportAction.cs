@@ -9,7 +9,7 @@ public class ImportAction : BaseAction
     public override Task<bool> Act()
     {
         var yaml = File.ReadAllText(Path!);
-        var actions = ActionDeserializer.Deserialize<Dictionary<string, List<BaseAction>>>(yaml)["Actions"];
+        var actions = ActionDeserializer.Deserialize(yaml);
         foreach (var action in actions)
             action.Act();
         return Task.FromResult(true);
