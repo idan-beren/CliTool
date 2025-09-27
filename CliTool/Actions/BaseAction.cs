@@ -8,15 +8,30 @@ public abstract class BaseAction : IAction
 
     public override string ToString()
     {
+        return ToIndentedString(0);
+    }
+
+    private string ToIndentedString(int indentLevel)
+    {
+        var indent = new string(' ', indentLevel * 2);
         var props = GetType()
             .GetProperties()
             .Select(p =>
             {
                 var value = p.GetValue(this);
+
                 if (value is IEnumerable<BaseAction> list)
-                    return $"{p.Name}=[{string.Join(", ", list.Select(a => a.ToString()))}]";
-                return $"{p.Name}={value}";
+                {
+                    var listValues = string.Join("\n", list.Select(a => a.ToIndentedString(indentLevel + 1)));
+                    return $"{indent}{p.Name}:\n{listValues}";
+                }
+
+                if (value is BaseAction action)
+                    return $"{indent}{p.Name}:\n{action.ToIndentedString(indentLevel + 1)}";
+
+                return $"{indent}{p.Name}: {value}";
             });
-        return $"{GetType().Name}({string.Join(", ", props)})";
+
+        return $"{indent}{GetType().Name}\n{string.Join("\n", props)}";
     }
 }

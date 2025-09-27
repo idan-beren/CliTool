@@ -11,6 +11,6 @@ public class DryOption() : Option<bool>(name: Name, description: Description)
     public void Apply(List<BaseAction> actions)
     {
         foreach (var action in actions)
-            Console.WriteLine(action);
+            Console.WriteLine($"{action}\n");
     }
 }
