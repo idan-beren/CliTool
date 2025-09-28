@@ -1,8 +1,8 @@
+using System.ComponentModel.DataAnnotations;
 using CliTool.Actions;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
-using Microsoft.Extensions.Logging;
 
 namespace CliTool.Utils;
 
@@ -47,12 +47,28 @@ public class ActionTypeResolver(INodeDeserializer inner) : INodeDeserializer
         if (actionType == null)
             throw new YamlException("Action does not define a 'Type' field");
 
-        var actionTypeType = ActionFactory.GetType(actionType);
-        var action = (BaseAction)nestedObjectDeserializer(new ReplayParser(buffer), actionTypeType)!;
-        action.Logger = ActionFactory.CreateLogger(actionType);
+        var action = CreateAction(nestedObjectDeserializer, actionType, buffer);
 
         value = action;
         return true;
+    }
+
+    private static BaseAction CreateAction(Func<IParser, Type, object?> nestedObjectDeserializer, string actionType, List<ParsingEvent> buffer)
+    {
+        var actionTypeType = ActionFactory.GetType(actionType);
+        var action = (BaseAction)nestedObjectDeserializer(new ReplayParser(buffer), actionTypeType)!;
+        action.Logger = ActionFactory.CreateLogger(actionType);
+        try
+        {
+            var context = new ValidationContext(action);
+            Validator.ValidateObject(action, context, validateAllProperties: true);
+        }
+        catch (ValidationException ex)
+        {
+            throw new YamlException($"Validation failed for {actionType}: {ex.Message}", ex);
+        }
+
+        return action;
     }
 
     private static void BufferNode(IParser reader, List<ParsingEvent> buffer)

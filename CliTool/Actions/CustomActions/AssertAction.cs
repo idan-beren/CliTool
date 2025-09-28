@@ -1,31 +1,24 @@
+using System.ComponentModel.DataAnnotations;
 using CliTool.Utils;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
+using Microsoft.Extensions.Logging;
 
 namespace CliTool.Actions.CustomActions;
 
 public class AssertAction : BaseAction
 {
+    [Required(ErrorMessage = "Condition is required")]
     public string? Condition { get; set; }
 
     public override async Task<bool> Act()
     {
-        var result = await Assert();
-
-        Console.WriteLine(result);
-        return result;
+        return await Assert();
     }
 
     protected async Task<bool> Assert()
     {
-        if (string.IsNullOrWhiteSpace(Condition))
-        {
-            Console.WriteLine("AssertAction: No condition provided.");
-            return false;
-        }
-
         var processedCondition = Condition!;
-
         foreach (var kv in GlobalVariables.GetAllVariables())
             processedCondition = processedCondition.Replace($"{{{{{kv.Key}}}}}", kv.Value?.ToString());
 
@@ -42,13 +35,15 @@ public class AssertAction : BaseAction
                     .WithImports("System")
                     .WithReferences(references)
             );
+            Logger.LogDebug("Got assertion result");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"AssertAction: Failed to evaluate condition '{processedCondition}' - {ex.Message}");
+            Logger.LogError("Assertion error - {Condition} {Error}", processedCondition, ex.Message);
             return false;
         }
-
+        
+        Logger.LogInformation("Assertion status: {Result}", result);
         return result;
     }
 }

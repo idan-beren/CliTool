@@ -1,4 +1,5 @@
 using System.CommandLine;
+using CliTool.Actions;
 using CliTool.Cli.Options;
 using CliTool.Utils;
 using Microsoft.Extensions.Logging;
@@ -20,17 +21,22 @@ public class RunCommand : Command
         AddOption(dryOption);
         AddOption(verboseOption);
         
-        this.SetHandler((file, dry, verbose) =>
+        this.SetHandler(async (file, dry, verbose) =>
         {
             GlobalVariables.SetVariable("LoggerLevel", verbose ? LogLevel.Debug : LogLevel.Information);
-
             var actions = fileOption.Apply(file);
-            Console.WriteLine(actions);
-            
-            if (dry)
+            if (dry) 
                 dryOption.Apply(actions);
-            if (verbose)
-                verboseOption.Apply(actions);
+            if (verbose) 
+                await verboseOption.Apply(actions);
+            if (!dry && !verbose) 
+                await Apply(actions);
         }, fileOption, dryOption, verboseOption);
+    }
+
+    private static async Task Apply(List<BaseAction> actions)
+    {
+        foreach (var action in actions)
+            await action.Act();
     }
 }

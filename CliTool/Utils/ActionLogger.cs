@@ -17,7 +17,7 @@ namespace CliTool.Utils
             var timestamp = DateTime.Now.ToString("HH:mm:ss");
             var message = formatter(state, exception);
 
-            var logLine = $"{timestamp} [{logLevel}] {category} {message}";
+            var logLine = $"{timestamp} [{logLevel}] ({category}) {message}";
             if (exception != null)
             {
                 logLine += Environment.NewLine + exception;

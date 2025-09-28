@@ -1,10 +1,11 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Logging;
 
 namespace CliTool.Actions;
 
 public abstract class BaseAction : IAction
 {
-    
+    [Required(ErrorMessage = "Type is required")]
     public string? Type { get; set; }
 
     public required ILogger Logger { get; set; }
