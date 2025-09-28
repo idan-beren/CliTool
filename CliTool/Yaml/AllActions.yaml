@@ -24,14 +24,16 @@ Actions:
     Actions:
       - Type: Log
         Message: "Hello-World!"
+      - Type: Log
+        Message: "Hello-World!"
         
   - Type: Retry
     Action:
       Type: Log
       Message: "Hello-World!"
-  
+
   - Type: Shell
-    Command: 
+    Command: echo hello-world!
       
   - Type: Condition
     Condition: "{{Price}} == 100"
