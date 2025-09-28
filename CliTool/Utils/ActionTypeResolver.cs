@@ -46,7 +46,11 @@ public class ActionTypeResolver(INodeDeserializer inner) : INodeDeserializer
         if (actionType == null)
             throw new YamlException("Action does not define a 'Type' field");
 
-        value = nestedObjectDeserializer(new ReplayParser(buffer), ActionFactory.Resolve(actionType));
+        var actionTypeType = ActionFactory.GetType(actionType);
+        var action = (BaseAction)nestedObjectDeserializer(new ReplayParser(buffer), actionTypeType)!;
+        action.Logger = ActionFactory.Create(actionType).Logger;
+        
+        value = action;
         return true;
     }
 

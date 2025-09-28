@@ -1,4 +1,5 @@
 using CliTool.Actions.CustomActions;
+using CliTool.Utils;
 
 namespace CliTool.Actions;
 
@@ -19,10 +20,22 @@ public static class ActionFactory
         { "Delay", typeof(DelayAction) }
     };
 
-    public static Type Resolve(string actionType)
+    public static BaseAction Create(string actionType)
     {
-        if (ActionTypes.TryGetValue(actionType, out var type))
-            return type;
-        throw new Exception($"Unknown action type: {actionType}");
+        if (!ActionTypes.TryGetValue(actionType, out var type))
+            throw new Exception($"Unknown action type: {actionType}");
+
+        var instance = (BaseAction?)Activator.CreateInstance(type)
+                       ?? throw new Exception($"Failed to create action of type {type.Name}");
+
+        instance.Logger = new ActionLogger(category: $"{actionType}Action");
+        return instance;
+    }
+
+    public static Type GetType(string actionType)
+    {
+        if (!ActionTypes.TryGetValue(actionType, out var type))
+            throw new Exception($"Unknown action type: {actionType}");
+        return type;
     }
 }

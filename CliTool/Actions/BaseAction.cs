@@ -1,8 +1,13 @@
+using Microsoft.Extensions.Logging;
+
 namespace CliTool.Actions;
 
 public abstract class BaseAction : IAction
 {
+    
     public string? Type { get; set; }
+
+    public required ILogger Logger { get; set; }
 
     public abstract Task<bool> Act();
 
