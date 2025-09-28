@@ -1,17 +1,28 @@
+using System.ComponentModel.DataAnnotations;
 using CliTool.Utils;
+using Microsoft.Extensions.Logging;
 
 namespace CliTool.Actions.CustomActions;
 
 public class ImportAction : BaseAction
 {
+    [Required(ErrorMessage = "Path is required")]
     public string? Path { get; set; }
     
-    public override Task<bool> Act()
+    public override async Task<bool> Act()
     {
-        var yaml = File.ReadAllText(Path!);
-        var actions = ActionDeserializer.Deserialize<Dictionary<string, List<BaseAction>>>(yaml)["Actions"];
+        var yaml = await File.ReadAllTextAsync(Path!);
+        Logger.LogDebug("The file in {Path} was loaded", Path);
+        
+        var actions = ActionDeserializer.Deserialize(yaml);
+        Logger.LogDebug("The actions were deserialized");
+
+        var actionsResult = true;
         foreach (var action in actions)
-            action.Act();
-        return Task.FromResult(true);
+            if (!await action.Act())
+                actionsResult = false;
+        
+        Logger.LogInformation("All actions run");
+        return actionsResult;
     }
 }

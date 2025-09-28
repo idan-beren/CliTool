@@ -1,10 +1,23 @@
-﻿using CliTool.Actions;
-using CliTool.Utils;
+﻿using System.CommandLine;
+using CliTool.Cli.Commands;
 
-var yaml = File.ReadAllText("/Users/idan.beren/Desktop/SteamProject/CliTool/CliTool/Yaml/Actions.yaml");
+namespace CliTool;
 
-var actions = ActionDeserializer.Deserialize<Dictionary<string, List<BaseAction>>>(yaml)["Actions"];
-
-foreach (var action in actions)
-    await action.Act();
+internal static class Program
+{
+    private const string Description = "YAML-Based Action Runner CLI";
     
+    static async Task<int> Main(string[] args)
+    {
+        await RunCommands(args);
+        return Environment.ExitCode;
+    }
+
+    private static async Task RunCommands(string[] args)
+    {
+        var rootCommand = new RootCommand(Description);
+        var runCommand = new RunCommand();
+        rootCommand.AddCommand(runCommand);
+        await rootCommand.InvokeAsync(args);
+    }
+}

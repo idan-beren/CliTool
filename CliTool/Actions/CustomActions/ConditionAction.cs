@@ -1,24 +1,30 @@
+using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.Logging;
+
 namespace CliTool.Actions.CustomActions;
 
 public class ConditionAction : AssertAction
 {
+    [Required(ErrorMessage = "Then is required")]
     public List<BaseAction>? Then { get; set; }
+    
+    [Required(ErrorMessage = "Else is required")]
     public List<BaseAction>? Else { get; set; }
 
     public override async Task<bool> Act()
     {
-        if (string.IsNullOrWhiteSpace(Condition))
-        {
-            Console.WriteLine("ConditionAction: No condition provided.");
-            return false;
-        }
-
-        var result = await Assert();
-        var actionsToRun = result ? Then : Else;
-        if (actionsToRun != null)
-            foreach (var action in actionsToRun)
-                await action.Act();
-
-        return result;
+        var conditionResult = await Assert();
+        Logger.LogDebug("Condition was asserted");
+        
+        var actions = conditionResult ? Then : Else;
+        
+        var actionsResult = true;
+        foreach (var action in actions!)
+            if (!await action.Act())
+                actionsResult = false;
+        
+        var finalResult = actionsResult && conditionResult;
+        Logger.LogInformation("Condition status: {Result}",  finalResult);
+        return finalResult;
     }
 }
