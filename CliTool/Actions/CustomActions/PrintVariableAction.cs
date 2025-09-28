@@ -11,7 +11,13 @@ public class PrintVariableAction : BaseAction
 
     public override Task<bool> Act()
     {
-        Logger.LogInformation("The value of the variable {Name} is {Variable}", Name!, GetVariableValue(Name!));
+        var var = GetVariableValue(Name!);
+        if (var == null)
+        {
+            Logger.LogInformation("The variable doesn't exist");
+            return Task.FromResult(false);
+        }
+        Logger.LogInformation("The value of the variable {Name} is {Variable}", Name!, var);
         return Task.FromResult(true);
     }
 }

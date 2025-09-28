@@ -65,7 +65,8 @@ public class ActionTypeResolver(INodeDeserializer inner) : INodeDeserializer
         }
         catch (ValidationException ex)
         {
-            throw new YamlException($"Validation failed for {actionType}: {ex.Message}", ex);
+            var start = buffer.First();
+            throw new YamlException(start.Start, start.End, $"Validation failed for {actionType} action: {ex.Message}");
         }
 
         return action;

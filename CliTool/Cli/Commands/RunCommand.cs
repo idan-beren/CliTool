@@ -23,14 +23,23 @@ public class RunCommand : Command
         
         this.SetHandler(async (file, dry, verbose) =>
         {
-            GlobalVariables.SetVariable("LoggerLevel", verbose ? LogLevel.Debug : LogLevel.Information);
-            var actions = fileOption.Apply(file);
-            if (dry) 
-                dryOption.Apply(actions);
-            if (verbose) 
-                await verboseOption.Apply(actions);
-            if (!dry && !verbose) 
-                await Apply(actions);
+            try
+            {
+                GlobalVariables.SetVariable("LoggerLevel", verbose ? LogLevel.Debug : LogLevel.Information);
+                var actions = fileOption.Apply(file);
+                if (dry)
+                    dryOption.Apply(actions);
+                if (verbose)
+                    await verboseOption.Apply(actions);
+                if (!dry && !verbose)
+                    await Apply(actions);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Environment.ExitCode = 1;
+            }
+            
         }, fileOption, dryOption, verboseOption);
     }
 

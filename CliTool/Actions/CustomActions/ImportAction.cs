@@ -17,10 +17,12 @@ public class ImportAction : BaseAction
         var actions = ActionDeserializer.Deserialize(yaml);
         Logger.LogDebug("The actions were deserialized");
 
+        var actionsResult = true;
         foreach (var action in actions)
-            await action.Act();
+            if (!await action.Act())
+                actionsResult = false;
         
         Logger.LogInformation("All actions run");
-        return true;
+        return actionsResult;
     }
 }

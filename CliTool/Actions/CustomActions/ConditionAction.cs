@@ -13,14 +13,18 @@ public class ConditionAction : AssertAction
 
     public override async Task<bool> Act()
     {
-        var result = await Assert();
+        var conditionResult = await Assert();
         Logger.LogDebug("Condition was asserted");
         
-        var actionsToRun = result ? Then : Else;
-        foreach (var action in actionsToRun!)
-            await action.Act();
+        var actions = conditionResult ? Then : Else;
         
-        Logger.LogInformation("Condition status: {Result}",  result);
-        return result;
+        var actionsResult = true;
+        foreach (var action in actions!)
+            if (!await action.Act())
+                actionsResult = false;
+        
+        var finalResult = actionsResult && conditionResult;
+        Logger.LogInformation("Condition status: {Result}",  finalResult);
+        return finalResult;
     }
 }
