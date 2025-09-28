@@ -2,6 +2,7 @@ using CliTool.Actions;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
+using Microsoft.Extensions.Logging;
 
 namespace CliTool.Utils;
 
@@ -48,8 +49,8 @@ public class ActionTypeResolver(INodeDeserializer inner) : INodeDeserializer
 
         var actionTypeType = ActionFactory.GetType(actionType);
         var action = (BaseAction)nestedObjectDeserializer(new ReplayParser(buffer), actionTypeType)!;
-        action.Logger = ActionFactory.Create(actionType).Logger;
-        
+        action.Logger = ActionFactory.CreateLogger(actionType);
+
         value = action;
         return true;
     }

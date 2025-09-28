@@ -1,5 +1,7 @@
 using System.CommandLine;
 using CliTool.Cli.Options;
+using CliTool.Utils;
+using Microsoft.Extensions.Logging;
 
 namespace CliTool.Cli.Commands;
 
@@ -20,6 +22,8 @@ public class RunCommand : Command
         
         this.SetHandler((file, dry, verbose) =>
         {
+            GlobalVariables.SetVariable("LoggerLevel", verbose ? LogLevel.Debug : LogLevel.Information);
+
             var actions = fileOption.Apply(file);
             Console.WriteLine(actions);
             
