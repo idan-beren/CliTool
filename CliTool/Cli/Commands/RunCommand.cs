@@ -25,27 +25,33 @@ public class RunCommand : Command
         {
             try
             {
+                Environment.ExitCode = 0;
+                var result = true;
                 GlobalVariables.SetVariable("LoggerLevel", verbose ? LogLevel.Debug : LogLevel.Information);
                 var actions = fileOption.Apply(file);
                 if (dry)
                     dryOption.Apply(actions);
                 if (verbose)
-                    await verboseOption.Apply(actions);
+                    result = await verboseOption.Apply(actions);
                 if (!dry && !verbose)
-                    await Apply(actions);
+                    result = await Apply(actions);
+                if (!result)
+                    Environment.ExitCode = 1;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 Environment.ExitCode = 1;
             }
-            
         }, fileOption, dryOption, verboseOption);
     }
 
-    private static async Task Apply(List<BaseAction> actions)
+    private static async Task<bool> Apply(List<BaseAction> actions)
     {
+        var result = true;
         foreach (var action in actions)
-            await action.Act();
+            if (!await action.Act())
+                result = false;
+        return result;
     }
 }

@@ -10,8 +10,10 @@ public class VerboseOption() : Option<bool>(name: Name, description: Description
     
     public async Task<bool> Apply(List<BaseAction> actions)
     {
+        var result = true;
         foreach (var action in actions)
-            await action.Act();
-        return true;
+            if (!await action.Act())
+                result = false;
+        return result;
     }
 }
