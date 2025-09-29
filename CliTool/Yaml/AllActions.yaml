@@ -1,40 +1,40 @@
 Actions:
-  
   - Type: Log
     Message: "Hello-World!"
-    
+
   - Type: Delay
     Duration: 100
-    
+
   - Type: Assert
     Condition: "1 + 2 == 3"
-  
+
   - Type: Http
     Method: GET
     Url: "https://www.google.com"
-      
+
   - Type: SetVariable
     Name: Price
     Value: 100
-    
+
   - Type: PrintVariable
     Name: Price
-  
+
   - Type: Parallel
     Actions:
       - Type: Log
-        Message: "Hello-World!"
+        Message: "Task A"
       - Type: Log
-        Message: "Hello-World!"
-        
+        Message: "Task B"
+
   - Type: Retry
+    Times: 3
     Action:
       Type: Log
-      Message: "Hello-World!"
+      Message: "Retrying..."
 
   - Type: Shell
     Command: echo hello-world!
-      
+
   - Type: Condition
     Condition: "{{Price}} == 100"
     Then:
@@ -43,6 +43,6 @@ Actions:
     Else:
       - Type: Log
         Message: "False"
-        
+
   - Type: Import
-    Path: /Users/idan.beren/Desktop/SteamProject/CliTool/CliTool/Yaml/ImportedActions.yaml
+    Path: ./Yaml/ImportedActions.yaml

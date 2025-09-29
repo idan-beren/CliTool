@@ -44,6 +44,7 @@ Actions:
         Message: "Task B"
         
   - Type: Retry
+    Times: 3
     Action:
       Type: Log
       Message: "Retrying..."
@@ -69,7 +70,7 @@ Actions:
 ## ⚡ Supported Actions
 
 | Action Type | Description                                        | Fields                             |
-| ----------- | -------------------------------------------------- | ---------------------------------- |
+| ----------- | -------------------------------------------------- |------------------------------------|
 | `log`       | Logs a message to the console.                     | `Message`                          |
 | `delay`     | Waits for a specified duration (ms).               | `Duration`                         |
 | `assert`    | Evaluates a condition. Stops execution if false.   | `Condition`                        |
@@ -77,7 +78,7 @@ Actions:
 | `set-var`   | Stores a variable in memory.                       | `Name`, `Value`                    |
 | `print-var` | Prints the value of a stored variable.             | `Name`                             |
 | `parallel`  | Runs multiple actions concurrently.                | `Actions` (list of steps)          |
-| `retry`     | Retries a step N times if it fails.                | `Attempts`, `Action`               |
+| `retry`     | Retries a step N times if it fails.                | `Times`, `Action`                  |
 | `shell`     | Runs a shell command and logs output.              | `Command`                          |
 | `condition` | Conditionally runs actions based on an expression. | `Condition`, `Then`, `Else`        |
 | `import`    | Loads another YAML file into the current workflow. | `Path`                             |
